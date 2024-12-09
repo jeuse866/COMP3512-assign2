@@ -1,53 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width= , initial-scale=1.0">
-    <title>F1 Dashboard Project</title>
-    <link rel="stylesheet" href="css/index-styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Dashboard</title>
 </head>
+
 <body>
 
-    <header> 
-        <h2>F1 Dashboard Project</h2>
-    </header>
+  <div id="app">
+    <div id="homeView" class="view">
+      <h1>F1 Dashboard</h1>
+      <p>Select a season to view the races:</p>
+      <select id="seasonSelect">
+        <option value="" disabled selected>Select a Season</option>
+      </select>
+      <button id="viewRacesBtn">View Races</button>
+    </div>
+    
+    <div id="racesView" class="view hidden">
+      <h1>Season Races</h1>
+      <button id="backToHomeBtn">Back to Home</button>
+      <div id="raceList">
 
-    <div class="container">
-        <div class="left-panel">
-            <div class="description">
-                <p> 
-                    This site contains Formula car racing data, providing races within a single season and able to examine their results, drivers, and constructors. This is done
-                    using Web APIs in PHP and SQLite database containing all necessary data.
-                <br>
-                Group Members: Jordan Mercurio, Jayden Eusebio-Wong
-                <a href="https://github.com/jeuse866/COMP3512-assign2.git">Github Repo</a>
-                </p>
-            </div>
-        </div>
+      </div>
 
-        <div class="right-panel">
-            <img src = "/jmerc673/data/1311532.jpeg"  alt="racecar image" style="width: 300px; height: auto;">
-        </div>
+      <p id="raceDetailsMessage" class="hidden">Please select a race to view its details.</p>
+      <div id="raceDetails" class="hidden">
+        <h2 id="raceTitle">Race Details</h2>
+        <section id="qualifyingResults">
+          <h3>Qualifying Results</h3>
+          <div id="qualifyingList">
+          </div>
+        </section>
+        <section id="raceResults">
+          <h3>Race Results</h3>
+          <div id="raceResultsList">
+          </div>
+        </section>
+      </div>
     </div>
 
-    <section id="home-view">
-        <h2>Select a Year</h2>
-        <select id="season-select">
-            <option value="">-- Select a Year --</option>
-        </select>
-        <button id="load-races-button">Load Races</button>
-    </section>
+    <dialog id="driverDialog">
+      <div id="driverDetails"></div>
+      <button onclick="document.querySelector('#driverDialog').close()">Close</button>
+    </dialog>
 
-    <section id="races-view" hidden>
-        <h2>Races</h2>
-        <button id="back-to-home-button">Back to Home</button>
-        <ul id="race-list"></ul>
-    </section>
+    <dialog id="constructorDialog">
+      <div id="constructorDetails"></div>
+      <button onclick="document.querySelector('#constructorDialog').close()">Close</button>
+    </dialog>
 
-    <dialog id="race-dialog"></dialog>
-    <dialog id="circuit-dialog"></dialog>
-    <dialog id="constructor-dialog"></dialog>
-    <dialog id="driver-dialog"></dialog>
+    <dialog id="circuitDialog">
+      <div id="circuitDetails"></div>
+      <button onclick="document.querySelector('#circuitDialog').close()">Close</button>
+    </dialog>
 
+    <!-- JavaScript Files -->
+    <script defer src="jmerc673/js/storage.js"></script>
+    <script defer src="jmerc673/js/api.js"></script>
+    <script defer src="jmerc673/js/dialogs.js"></script>
+    <script defer src="jmerc673/js/app.js"></script>
 </body>
+
 </html>
