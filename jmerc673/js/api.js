@@ -53,8 +53,10 @@ async function fetchRaceResults(raceId) {
 async function fetchRaceResultsByDriver(driverId) {
   try {
       const response = await fetch(`https://www.randyconnolly.com/funwebdev/3rd/api/f1/driverResults.php?driver=${driverId}`);
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const data = await response.json();
-
       return data.map(result => ({
           round: result.race?.round || "N/A",
           raceName: result.race?.name || "N/A",
@@ -62,12 +64,26 @@ async function fetchRaceResultsByDriver(driverId) {
       }));
   } catch (error) {
       console.error("Error fetching race results by driver:", error);
-      return [];
+      return []; // Return an empty array if fetching fails
   }
 }
 
-async function fetchRaceResultsByConstructor(constructorRef) {
-  const url = `${API_BASE_URL}/constructorResults.php?constructor=${constructorRef}`;
-  const key = `constructor_results_${constructorRef}`;
-  return await fetchAndCache(url, key);
+
+async function fetchRaceResultsByConstructor(constructorId) {
+  try {
+      const response = await fetch(`https://www.randyconnolly.com/funwebdev/3rd/api/f1/constructorResults.php?constructor=${constructorId}`);
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.map(result => ({
+          round: result.race?.round || "N/A",
+          raceName: result.race?.name || "N/A",
+          driverName: `${result.driver?.forename || "N/A"} ${result.driver?.surname || "N/A"}`,
+          position: result.position || "N/A",
+      }));
+  } catch (error) {
+      console.error("Error fetching race results by constructor:", error);
+      return [];
+  }
 }
