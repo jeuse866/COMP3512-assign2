@@ -58,6 +58,26 @@ async function showDriverDialog(driverId) {
 
         const driverImage = "https://placehold.co/600x400";
 
+        // Fetch race results for the driver
+        const raceResults = await fetchRaceResultsByDriver(driverId);
+
+        // Construct race results table
+        const raceResultsHTML = `
+            <table>
+                <thead>
+                    <tr><th>Round</th><th>Race Name</th><th>Position</th></tr>
+                </thead>
+                <tbody>
+                    ${raceResults.map(result => `
+                        <tr>
+                            <td>${result.round}</td>
+                            <td>${result.raceName}</td>
+                            <td>${result.position}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>`;
+
         driverDetails.innerHTML = `
             <img src="${driverImage}" alt="Image of ${driverData.forename} ${driverData.surname}" class="driver-image">
             <p class="Driver-${driverData.id}"><strong>Name:</strong> ${driverData.forename} ${driverData.surname}</p>
@@ -67,6 +87,8 @@ async function showDriverDialog(driverId) {
             <p><strong>Wins:</strong> ${driverData.wins || "N/A"}</p>
             <p><a href="${driverData.url}" target="_blank">Learn more on Wikipedia</a></p>
             <button id="toggleFavoriteDriverBtn">${isFavorite ? "Remove from Favorites" : "Add to Favorites"}</button>
+            <div class="race-results">${raceResultsHTML}</div>
+            <button id="closeDriverDialog">Close</button>
         `;
 
         const toggleFavoriteBtn = document.querySelector("#toggleFavoriteDriverBtn");
@@ -79,6 +101,10 @@ async function showDriverDialog(driverId) {
                 toggleFavoriteBtn.textContent = "Remove from Favorites";
             }
             isFavorite = !isFavorite;
+        });
+
+        document.querySelector("#closeDriverDialog").addEventListener("click", () => {
+            driverDialog.close();
         });
 
         driverDialog.showModal();

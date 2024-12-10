@@ -50,10 +50,20 @@ async function fetchRaceResults(raceId) {
 }
 
 
-async function fetchRaceResultsByDriver(driverRef) {
-  const url = `${API_BASE_URL}/driverResults.php?driver=${driverRef}`;
-  const key = `driver_results_${driverRef}`;
-  return await fetchAndCache(url, key);
+async function fetchRaceResultsByDriver(driverId) {
+  try {
+      const response = await fetch(`https://www.randyconnolly.com/funwebdev/3rd/api/f1/driverResults.php?driver=${driverId}`);
+      const data = await response.json();
+
+      return data.map(result => ({
+          round: result.race?.round || "N/A",
+          raceName: result.race?.name || "N/A",
+          position: result.position || "N/A",
+      }));
+  } catch (error) {
+      console.error("Error fetching race results by driver:", error);
+      return [];
+  }
 }
 
 async function fetchRaceResultsByConstructor(constructorRef) {
