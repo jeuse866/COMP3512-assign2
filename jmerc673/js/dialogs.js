@@ -39,79 +39,87 @@ function updateFavoritesInTable() {
     }
 }
 
-async function showDriverDialog(driverId) {
-    const driverDialog = document.querySelector("#driverDialog");
-    const driverDetails = document.querySelector("#driverDetails");
+async function showDriverDialog(driverRef) {
+  const driverDialog = document.querySelector("#driverDialog");
+  const driverDetails = document.querySelector("#driverDetails");
 
-    try {
-        const cachedDrivers = getFromLocalStorage("drivers") || [];
-        let driverData = cachedDrivers.find(driver => driver.id === driverId);
+  try {
+    const cachedDrivers = getFromLocalStorage("drivers") || [];
+    let driverData = cachedDrivers.find(driver => driver.id === driverRef);
 
-        if (!driverData) {
-            const response = await fetch(`https://www.randyconnolly.com/funwebdev/3rd/api/f1/drivers.php?ref=${driverId}`);
-            driverData = await response.json();
-            saveToLocalStorage("drivers", [...cachedDrivers, driverData]);
-        }
-
-        const favorites = getFromLocalStorage("favorites") || [];
-        let isFavorite = favorites.some(fav => fav.item.id === driverId && fav.type === "Driver");
-
-        const driverImage = "https://placehold.co/600x400";
-
-        // Fetch race results for the driver
-        const raceResults = await fetchRaceResultsByDriver(driverId);
-
-        // Construct race results table
-        const raceResultsHTML = `
-            <table>
-                <thead>
-                    <tr><th>Round</th><th>Race Name</th><th>Position</th></tr>
-                </thead>
-                <tbody>
-                    ${raceResults.map(result => `
-                        <tr>
-                            <td>${result.round}</td>
-                            <td>${result.raceName}</td>
-                            <td>${result.position}</td>
-                        </tr>
-                    `).join("")}
-                </tbody>
-            </table>`;
-
-        driverDetails.innerHTML = `
-            <img src="${driverImage}" alt="Image of ${driverData.forename} ${driverData.surname}" class="driver-image">
-            <p class="Driver-${driverData.id}"><strong>Name:</strong> ${driverData.forename} ${driverData.surname}</p>
-            <p><strong>Date of Birth:</strong> ${driverData.dob}</p>
-            <p><strong>Nationality:</strong> ${driverData.nationality}</p>
-            <p><strong>Permanent Number:</strong> ${driverData.permanentNumber || "N/A"}</p>
-            <p><strong>Wins:</strong> ${driverData.wins || "N/A"}</p>
-            <p><a href="${driverData.url}" target="_blank">Learn more on Wikipedia</a></p>
-            <button id="toggleFavoriteDriverBtn">${isFavorite ? "Remove from Favorites" : "Add to Favorites"}</button>
-            <div class="race-results">${raceResultsHTML}</div>
-            <button id="closeDriverDialog">Close</button>
-        `;
-
-        const toggleFavoriteBtn = document.querySelector("#toggleFavoriteDriverBtn");
-        toggleFavoriteBtn.addEventListener("click", () => {
-            if (isFavorite) {
-                removeFromFavorites("Driver", driverData.id);
-                toggleFavoriteBtn.textContent = "Add to Favorites";
-            } else {
-                addToFavorites("Driver", driverData);
-                toggleFavoriteBtn.textContent = "Remove from Favorites";
-            }
-            isFavorite = !isFavorite;
-        });
-
-        document.querySelector("#closeDriverDialog").addEventListener("click", () => {
-            driverDialog.close();
-        });
-
-        driverDialog.showModal();
-    } catch (error) {
-        console.error("Error loading driver details:", error);
-        driverDetails.innerHTML = `<p>Error loading driver details. Please try again later.</p>`;
+    if (!driverData) {
+      const response = await fetch(`${API_BASE_URL}/drivers.php?ref=${driverRef}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      driverData = await response.json();
+      saveToLocalStorage("drivers", [...cachedDrivers, driverData]);
     }
+
+    const favorites = getFromLocalStorage("favorites") || [];
+    let isFavorite = favorites.some(fav => fav.item.id === driverRef && fav.type === "Driver");
+
+    const driverImage = "https://placehold.co/600x400";
+
+    const results2023 = await fetchRaceResultsByDriver(driverRef, 2023);
+    const results2022 = await fetchRaceResultsByDriver(driverRef, 2022);
+    const results2021 = await fetchRaceResultsByDriver(driverRef, 2021);
+    const results2020 = await fetchRaceResultsByDriver(driverRef, 2020);
+
+    const raceResults = [...results2023, ...results2022, ...results2021, ...results2020];
+
+    const raceResultsHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Round</th>
+            <th>Race Name</th>
+            <th>Position</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${raceResults.map(result => `
+            <tr>
+              <td>${result.round || "N/A"}</td>
+              <td>${result.name || "N/A"}</td>
+              <td>${result.positionOrder || "N/A"}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`;
+
+    driverDetails.innerHTML = `
+      <img src="${driverImage}" alt="Image of ${driverData.forename} ${driverData.surname}" class="driver-image">
+      <p><strong>Name:</strong> ${driverData.forename} ${driverData.surname}</p>
+      <p><strong>Date of Birth:</strong> ${driverData.dob}</p>
+      <p><strong>Nationality:</strong> ${driverData.nationality}</p>
+      <p><a href="${driverData.url}" target="_blank">Learn more on Wikipedia</a></p>
+      <button id="toggleFavoriteDriverBtn">${isFavorite ? "Remove from Favorites" : "Add to Favorites"}</button>
+      <div class="race-results">${raceResultsHTML}</div>
+      <button id="closeDriverDialog">Close</button>
+    `;
+
+    const toggleFavoriteBtn = document.querySelector("#toggleFavoriteDriverBtn");
+    toggleFavoriteBtn.addEventListener("click", () => {
+      if (isFavorite) {
+        removeFromFavorites("Driver", driverRef);
+        toggleFavoriteBtn.textContent = "Add to Favorites";
+      } else {
+        addToFavorites("Driver", driverData);
+        toggleFavoriteBtn.textContent = "Remove from Favorites";
+      }
+      isFavorite = !isFavorite;
+    });
+
+    document.querySelector("#closeDriverDialog").addEventListener("click", () => {
+      driverDialog.close();
+    });
+
+    driverDialog.showModal();
+  } catch (error) {
+    console.error("Error loading driver details:", error);
+    driverDetails.innerHTML = `<p>Error loading driver details. Please try again later.</p>`;
+  }
 }
 
 async function showConstructorDialog(constructorId) {
