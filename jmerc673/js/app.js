@@ -77,7 +77,6 @@ async function loadRaces(season) {
                 loadRaceDetails(race);
             });
 
-            // Update hearts for favorited races
             const favorites = getFromLocalStorage("favorites") || [];
             if (favorites.some(fav => fav.type === "Race" && fav.item.id === race.id)) {
                 markAsFavorite("Race", race.id);

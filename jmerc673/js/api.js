@@ -50,15 +50,14 @@ async function fetchRaceResults(raceId) {
 }
 
 
-async function fetchDrivers() {
-  const url = `${API_BASE_URL}/drivers.php`;
-  const key = "drivers";
+async function fetchRaceResultsByDriver(driverRef) {
+  const url = `${API_BASE_URL}/driverResults.php?driver=${driverRef}`;
+  const key = `driver_results_${driverRef}`;
   return await fetchAndCache(url, key);
 }
 
-
-async function fetchConstructors() {
-  const url = `${API_BASE_URL}/constructors.php`;
-  const key = "constructors";
+async function fetchRaceResultsByConstructor(constructorRef) {
+  const url = `${API_BASE_URL}/constructorResults.php?constructor=${constructorRef}`;
+  const key = `constructor_results_${constructorRef}`;
   return await fetchAndCache(url, key);
 }
