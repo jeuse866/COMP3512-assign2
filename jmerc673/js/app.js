@@ -13,6 +13,7 @@ function setupEventListeners() {
         if (selectedSeason) {
             await loadRaces(selectedSeason);
             showView("#racesView");
+            hideDropdownControls();
         } else {
             alert("Please select a season!");
         }
@@ -20,6 +21,12 @@ function setupEventListeners() {
 
     backToHomeBtn.addEventListener("click", () => {
         showView("#homeView");
+        resetDropdownControls();
+    });
+
+    document.querySelector("#logo").addEventListener("click", (e) => {
+        e.preventDefault();
+        resetHomePage();
     });
 }
 
@@ -56,22 +63,29 @@ async function loadRaces(season) {
         races.forEach((race) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${race.round}</td>
-                <td>${race.name || "Unknown Race"}</td>
-                <td>
-                    <button class="viewDetailsBtn" data-race-id="${race.id}">Results</button>
-                </td>
-            `;
+                    <td>${race.round}</td>
+                    <td class="Race-${race.id}">
+                        ${race.name || "Unknown Race"}
+                    </td>
+                    <td>
+                        <button class="viewDetailsBtn" data-race-id="${race.id}">Results</button>
+                    </td>
+                `;
 
             tbody.appendChild(row);
             row.querySelector(".viewDetailsBtn").addEventListener("click", () => {
                 loadRaceDetails(race);
             });
+
+            // Update hearts for favorited races
+            const favorites = getFromLocalStorage("favorites") || [];
+            if (favorites.some(fav => fav.type === "Race" && fav.item.id === race.id)) {
+                markAsFavorite("Race", race.id);
+            }
         });
 
         raceList.appendChild(table);
         updateFavoritesInTable();
-
     } catch (error) {
         console.error("Error loading races:", error);
         raceList.innerHTML = `<p>Error loading races. Please try again later.</p>`;
@@ -110,121 +124,120 @@ async function loadRaceDetails(race) {
             fetchRaceResults(race.id),
         ]);
 
-        if (Array.isArray(qualifyingResults)) {
-            const table = document.createElement("table");
-            table.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Position</th>
-                        <th>Driver</th>
-                        <th>Constructor</th>
-                        <th>Q1</th>
-                        <th>Q2</th>
-                        <th>Q3</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            `;
-
-            const tbody = table.querySelector("tbody");
-
-            qualifyingResults.sort((a, b) => a.position - b.position);
-            qualifyingResults.forEach((result) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${result.position}</td>
-                    <td>
-                        <a href="#" class="driver-link" data-driver-id="${result.driver.id}">
-                            ${result.driver.forename} ${result.driver.surname}
-                        </a>
-                    </td>
-                    <td>
-                        <a href="#" class="constructor-link" data-constructor-id="${result.constructor.id}">
-                            ${result.constructor.name}
-                        </a>
-                    </td>
-                    <td>${result.q1 || "N/A"}</td>
-                    <td>${result.q2 || "N/A"}</td>
-                    <td>${result.q3 || "N/A"}</td>
-                `;
-                tbody.appendChild(row);
-
-                row.querySelector(".driver-link").addEventListener("click", (e) => {
-                    e.preventDefault();
-                    showDriverDialog(result.driver.ref);
-                });
-
-                row.querySelector(".constructor-link").addEventListener("click", (e) => {
-                    e.preventDefault();
-                    showConstructorDialog(result.constructor.ref);
-                });
-            });
-
-            qualifyingList.appendChild(table);
-            updateFavoritesInTable();
-        } else {
-            qualifyingList.innerHTML = `<p>No qualifying results available.</p>`;
-        }
-
-        if (Array.isArray(raceResults)) {
-            const table = document.createElement("table");
-            table.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Position</th>
-                        <th>Driver</th>
-                        <th>Constructor</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            `;
-
-            const tbody = table.querySelector("tbody");
-
-            raceResults.sort((a, b) => a.position - b.position);
-            raceResults.forEach((result, index) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${result.position}</td>
-                    <td>
-                        <a href="#" class="driver-link" data-driver-id="${result.driver.id}">
-                            ${result.driver.forename} ${result.driver.surname}
-                        </a>
-                    </td>
-                    <td>
-                        <a href="#" class="constructor-link" data-constructor-id="${result.constructor.id}">
-                            ${result.constructor.name}
-                        </a>
-                    </td>
-                `;
-                tbody.appendChild(row);
-
-                row.querySelector(".driver-link").addEventListener("click", (e) => {
-                    e.preventDefault();
-                    showDriverDialog(result.driver.ref);
-                });
-
-                row.querySelector(".constructor-link").addEventListener("click", (e) => {
-                    e.preventDefault();
-                    showConstructorDialog(result.constructor.ref);
-                });
-            });
-
-            raceResultsList.appendChild(table);
-            updateFavoritesInTable();
-        } else {
-            raceResultsList.innerHTML = `<p>No race results available.</p>`;
-        }
+        populateResultsTable(qualifyingList, qualifyingResults, "qualifying");
+        populateResultsTable(raceResultsList, raceResults, "race");
     } catch (error) {
         console.error("Error loading race details:", error);
     }
 }
 
+function populateResultsTable(container, results, type) {
+    if (Array.isArray(results)) {
+        const table = document.createElement("table");
+        table.id = type === "qualifying" ? "qualifyingResultsTable" : "raceResultsTable";
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Driver</th>
+                    <th>Constructor</th>
+                    ${type === "qualifying" ? "<th>Q1</th><th>Q2</th><th>Q3</th>" : ""}
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+
+        const tbody = table.querySelector("tbody");
+        results.sort((a, b) => a.position - b.position);
+        results.forEach((result) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${result.position}</td>
+                <td class="Driver-${result.driver.id}">
+                    <a href="#" class="driver-link" data-driver-id="${result.driver.id}">
+                        ${result.driver.forename} ${result.driver.surname}
+                    </a>
+                </td>
+                <td class="Constructor-${result.constructor.id}">
+                    <a href="#" class="constructor-link" data-constructor-id="${result.constructor.id}">
+                        ${result.constructor.name}
+                    </a>
+                </td>
+                ${type === "qualifying" ? `
+                <td>${result.q1 || "N/A"}</td>
+                <td>${result.q2 || "N/A"}</td>
+                <td>${result.q3 || "N/A"}</td>` : ""}
+            `;
+
+            tbody.appendChild(row);
+
+            row.querySelector(".driver-link").addEventListener("click", (e) => {
+                e.preventDefault();
+                showDriverDialog(result.driver.ref);
+            });
+
+            row.querySelector(".constructor-link").addEventListener("click", (e) => {
+                e.preventDefault();
+                showConstructorDialog(result.constructor.ref);
+            });
+        });
+
+        container.appendChild(table);
+        addSorting(table.id);
+    } else {
+        container.innerHTML = `<p>No ${type} results available.</p>`;
+    }
+}
+
 function showView(viewSelector) {
+
     document.querySelectorAll(".view").forEach(view => {
         view.classList.add("hidden");
     });
-    document.querySelector(viewSelector).classList.remove("hidden");
+
+
+    const selectedView = document.querySelector(viewSelector);
+    if (selectedView) {
+        selectedView.classList.remove("hidden");
+    }
+
+
+    if (viewSelector === "#homeView") {
+
+        const seasonSelect = document.querySelector("#seasonSelect");
+        const viewRacesBtn = document.querySelector("#viewRacesBtn");
+        const trackImage = document.querySelector(".right-content img");
+
+        if (seasonSelect) seasonSelect.style.display = "inline-block";
+        if (viewRacesBtn) viewRacesBtn.style.display = "inline-block";
+        if (trackImage) trackImage.style.display = "inline-block";
+    } else {
+
+        const seasonSelect = document.querySelector("#seasonSelect");
+        const viewRacesBtn = document.querySelector("#viewRacesBtn");
+        const trackImage = document.querySelector(".right-content img");
+
+        if (seasonSelect) seasonSelect.style.display = "none";
+        if (viewRacesBtn) viewRacesBtn.style.display = "none";
+        if (trackImage) trackImage.style.display = "none";
+    }
+}
+
+function resetHomePage() {
+    showView("#homeView");
+    resetDropdownControls();
+    const raceList = document.querySelector("#raceList");
+    raceList.innerHTML = "";
+    document.querySelector("#qualifyingList").innerHTML = "";
+    document.querySelector("#raceResultsList").innerHTML = "";
+}
+
+function hideDropdownControls() {
+    document.querySelector(".content-row").style.display = "none";
+}
+
+function resetDropdownControls() {
+    document.querySelector(".content-row").style.display = "flex";
 }
 
 function populateSeasonDropdown() {
@@ -237,4 +250,38 @@ function populateSeasonDropdown() {
         option.textContent = season;
         seasonSelect.appendChild(option);
     });
+}
+
+function addSorting(tableId) {
+    const table = document.querySelector(`#${tableId}`);
+    const headers = table.querySelectorAll('th');
+    headers.forEach((header, index) => {
+        header.addEventListener("click", () => {
+            sortTable(table, index);
+            updateSortIndicator(header);
+        });
+    });
+}
+
+function sortTable(table, columnIndex) {
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+    const sortedRows = rows.sort((a, b) => {
+        const aText = a.children[columnIndex].textContent.trim();
+        const bText = b.children[columnIndex].textContent.trim();
+        return aText.localeCompare(bText, undefined, { numeric: true });
+    });
+    sortedRows.forEach(row => table.querySelector("tbody").appendChild(row));
+}
+
+function updateSortIndicator(header) {
+    const headers = header.parentElement.querySelectorAll("th");
+    headers.forEach(h => h.classList.remove("ascending", "descending"));
+
+    if (header.classList.contains("ascending")) {
+        header.classList.remove("ascending");
+        header.classList.add("descending");
+    } else {
+        header.classList.remove("descending");
+        header.classList.add("ascending");
+    }
 }

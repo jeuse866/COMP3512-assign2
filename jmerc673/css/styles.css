@@ -1,1 +1,257 @@
-test
+
+body, h1, h2, h3, p, button, table, th, td {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1a1a; 
+    color: #e0e0e0; 
+    line-height: 1.6;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+
+.view {
+    display: none;
+}
+
+.view:not(.hidden) {
+    display: block;
+}
+
+
+button {
+    background-color: #d60000; 
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #ff4c4c; 
+}
+
+button:disabled {
+    background-color: #555555; 
+    cursor: not-allowed;
+}
+
+
+.hidden {
+    display: none !important;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #444; 
+}
+
+table th {
+    background: linear-gradient(to right, #d60000, #ff4c4c); 
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+table tr:nth-child(even) {
+    background-color: #2a2a2a; 
+}
+
+table tr:hover {
+    background-color: #3a3a3a; 
+}
+
+
+#raceDetails {
+    display: flex;
+    flex-direction: column; 
+    gap: 20px; 
+}
+
+
+.results-container {
+    display: flex;
+    flex-wrap: nowrap; 
+    gap: 20px; 
+    justify-content: flex-start; 
+    align-items: flex-start;
+    overflow-x: auto;
+    width: 100%; 
+    margin-top: 10px;
+}
+
+
+.results-container section {
+    flex: 1;
+    min-width: 300px; 
+}
+
+.results-container table {
+    width: 100%; 
+    border-collapse: collapse;
+    margin-top: 10px;
+    border: 1px solid #444; 
+}
+
+.results-container th, .results-container td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #444;
+}
+
+.results-container th {
+    background: linear-gradient(to right, #d60000, #ff4c4c); 
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.results-container tr:nth-child(even) {
+    background-color: #2a2a2a; 
+}
+
+.results-container tr:hover {
+    background-color: #3a3a3a; 
+}
+
+
+dialog {
+    background-color: #1a1a1a; 
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    color: #e0e0e0; 
+}
+
+dialog img {
+    max-width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+
+#driverDetails, #constructorDetails, #circuitDetails {
+    margin-bottom: 20px;
+}
+
+#driverDetails p, #constructorDetails p, #circuitDetails p {
+    margin: 5px 0;
+}
+
+#raceResultsList, #qualifyingList {
+    margin-top: 20px;
+}
+
+
+.heart {
+    color: #ff0000; 
+    font-size: 1.2em;
+    margin-left: 5px;
+}
+
+
+#logo img {
+    height: 50px;
+    width: auto;
+    cursor: pointer;
+}
+
+
+header {
+    background: linear-gradient(to right, #d60000, #1a1a1a); 
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    position: relative; 
+}
+
+header h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0;
+    position: absolute; 
+    left: 50%; 
+    transform: translateX(-50%); 
+}
+
+
+.home-container {
+    border: 1px solid #444; 
+    border-radius: 8px;
+    width: 100%;
+    padding: 20px;
+    background-color: #1a1a1a; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); 
+    margin-bottom: 20px;
+}
+
+
+.header-row {
+    display: flex;
+    align-items: center;
+}
+
+
+.content-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #1a1a1a; 
+    max-width: 90%;
+    margin: 20px auto;
+}
+
+
+.left-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.right-content {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.right-content img {
+    max-width: 100%;
+    height: auto;
+    height: 500px;
+    border-radius: 5px;
+    object-fit: contain;
+}
+

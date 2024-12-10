@@ -1,70 +1,64 @@
 const API_BASE_URL = "https://www.randyconnolly.com/funwebdev/3rd/api/f1";
 
+
+function getCachedData(key) {
+  const cachedData = localStorage.getItem(key);
+  return cachedData ? JSON.parse(cachedData) : null;
+}
+
+function cacheData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+
+async function fetchAndCache(url, key) {
+  const cachedData = getCachedData(key);
+  if (cachedData) {
+    console.log(`Using cached data for: ${key}`);
+    return cachedData;
+  }
+
+  console.log(`Fetching fresh data for: ${key}`);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch data from ${url}: ${response.statusText}`);
+  }
+  const data = await response.json();
+  cacheData(key, data);
+  return data;
+}
+
+
 async function fetchRaces(season) {
   const url = `${API_BASE_URL}/races.php?season=${season}`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch races for season ${season}: ${response.statusText}`);
-    }
-    const data = await response.json();
-    console.log("Races Data:", data);
-    return data;
-  } catch (error) {
-    console.error("Error fetching race data:", error);
-    throw error;
-  }
+  const key = `races_${season}`;
+  return await fetchAndCache(url, key);
 }
+
 
 async function fetchQualifyingResults(raceId) {
-  const qualifyingUrl = `${API_BASE_URL}/qualifying.php?race=${raceId}`;
-  const driversUrl = `${API_BASE_URL}/drivers.php`;
-  const constructorsUrl = `${API_BASE_URL}/constructors.php`;
-
-  try {
-    const [qualifyingData, driversData, constructorsData] = await Promise.all([
-      fetch(qualifyingUrl).then(res => res.json()),
-      fetch(driversUrl).then(res => res.json()),
-      fetch(constructorsUrl).then(res => res.json()),
-    ]);
-
-    const driverMap = Object.fromEntries(driversData.map(d => [d.driverId, `${d.forename} ${d.surname}`]));
-    const constructorMap = Object.fromEntries(constructorsData.map(c => [c.constructorId, c.name]));
-
-    return qualifyingData.map(result => ({
-      ...result,
-      Driver: driverMap[result.driverId] || "Unknown",
-      Constructor: constructorMap[result.constructorId] || "Unknown",
-    }));
-  } catch (error) {
-    console.error("Error fetching qualifying results:", error);
-    throw error;
-  }
+  const url = `${API_BASE_URL}/qualifying.php?race=${raceId}`;
+  const key = `qualifying_${raceId}`;
+  return await fetchAndCache(url, key);
 }
 
+
 async function fetchRaceResults(raceId) {
-  const resultsUrl = `${API_BASE_URL}/results.php?race=${raceId}`;
-  const driversUrl = `${API_BASE_URL}/drivers.php`;
-  const constructorsUrl = `${API_BASE_URL}/constructors.php`;
-
-  try {
-    const [resultsData, driversData, constructorsData] = await Promise.all([
-      fetch(resultsUrl).then(res => res.json()),
-      fetch(driversUrl).then(res => res.json()),
-      fetch(constructorsUrl).then(res => res.json()),
-    ]);
-
-    const driverMap = Object.fromEntries(driversData.map(d => [d.driverId, `${d.forename} ${d.surname}`]));
-    const constructorMap = Object.fromEntries(constructorsData.map(c => [c.constructorId, c.name]));
+  const url = `${API_BASE_URL}/results.php?race=${raceId}`;
+  const key = `results_${raceId}`;
+  return await fetchAndCache(url, key);
+}
 
 
-    return resultsData.map(result => ({
-      ...result,
-      Driver: driverMap[result.driverId] || "Unknown",
-      Constructor: constructorMap[result.constructorId] || "Unknown",
-    }));
-  } catch (error) {
-    console.error("Error fetching race results:", error);
-    throw error;
-  }
+async function fetchDrivers() {
+  const url = `${API_BASE_URL}/drivers.php`;
+  const key = "drivers";
+  return await fetchAndCache(url, key);
+}
+
+
+async function fetchConstructors() {
+  const url = `${API_BASE_URL}/constructors.php`;
+  const key = "constructors";
+  return await fetchAndCache(url, key);
 }

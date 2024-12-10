@@ -4,64 +4,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="jmerc673/css/styles.css">
   <title>F1 Dashboard</title>
 </head>
 
 <body>
 
-  <div id="app">
-    <div id="homeView" class="view">
-      <h1>F1 Dashboard</h1>
-      <p>Select a season to view the races:</p>
-      <select id="seasonSelect">
-        <option value="" disabled selected>Select a Season</option>
-      </select>
-      <button id="viewRacesBtn">View Races</button>
+  <!-- Header Section -->
+  <header>
+    <div class="home-container">
+      <!-- Top Row: Logo and Title -->
+      <div class="header-row">
+        <a href="#" id="logo" onclick="showView('#homeView')">
+          <img src="jmerc673/F1-logo.png" alt="F1 Dashboard Logo">
+        </a>
+        <h1>F1 Dashboard</h1>
+      </div>
     </div>
-    
+  </header>
+
+  <!-- Main App -->
+  <div id="app">
+    <!-- Home View -->
+    <div id="homeView" class="view">
+      <!-- Content Section -->
+      <div class="content-row">
+        <div class="left-content">
+          <p>
+            This website is an F1 Dashboard that allows users to explore and view details of Formula 1 races by
+            selecting a season.
+            On the homepage, users can select a season from a dropdown menu and view the races for that year.
+            Upon selection, the website displays a list of races in a table, including their rounds, race names, and a
+            button to view detailed results.
+            Users can click on "Results" for each race to access in-depth qualifying and race results, including
+            drivers, constructors, and performance times.
+            The site features a functional navigation system where users can return to the homepage by clicking on the
+            logo in the top left corner.
+            With clean layouts and an engaging design, this dashboard delivers an intuitive and seamless experience for
+            Formula 1 fans.
+          </p>
+          <div class="select-container">
+            <p>Select a season to view the races:</p>
+            <select id="seasonSelect">
+              <option value="" disabled selected>Select a Season</option>
+            </select>
+            <button id="viewRacesBtn">View Races</button>
+          </div>
+          <p>Group Members: Jordan Mercurio, Jayden Eusebio-Wong</p>
+          <a href="https://github.com/jeuse866/COMP3512-assign2.git" target="_blank">Github Repo</a>
+        </div>
+        <div class="right-content">
+          <img src="jmerc673/1309608006.avif" alt="F1 Track">
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Races View -->
     <div id="racesView" class="view hidden">
       <h1>Season Races</h1>
       <button id="backToHomeBtn">Back to Home</button>
-      <div id="raceList">
-
-      </div>
+      <div id="raceList"></div>
 
       <p id="raceDetailsMessage" class="hidden">Please select a race to view its details.</p>
       <div id="raceDetails" class="hidden">
-        <h2 id="raceTitle">Race Details</h2>
-        <section id="qualifyingResults">
-          <h3>Qualifying Results</h3>
-          <div id="qualifyingList">
-          </div>
-        </section>
-        <section id="raceResults">
-          <h3>Race Results</h3>
-          <div id="raceResultsList">
-          </div>
-        </section>
+        <h2 id="raceTitle">Results for Bahrain Grand Prix (<a href="#">Bahrain International Circuit</a>)</h2>
+
+        <div class="results-container">
+          <section id="qualifyingResults">
+            <h3>Qualifying Results</h3>
+            <div id="qualifyingList"></div>
+          </section>
+
+          <section id="raceResults">
+            <h3>Race Results</h3>
+            <div id="raceResultsList"></div>
+          </section>
+        </div>
       </div>
     </div>
+  </div>
 
-    <dialog id="driverDialog">
-      <div id="driverDetails"></div>
-      <button onclick="document.querySelector('#driverDialog').close()">Close</button>
-    </dialog>
+  <!-- Dialogs -->
+  <dialog id="driverDialog">
+    <div id="driverDetails"></div>
+    <button onclick="document.querySelector('#driverDialog').close()">Close</button>
+  </dialog>
 
-    <dialog id="constructorDialog">
-      <div id="constructorDetails"></div>
-      <button onclick="document.querySelector('#constructorDialog').close()">Close</button>
-    </dialog>
+  <dialog id="constructorDialog">
+    <div id="constructorDetails"></div>
+  </dialog>
 
-    <dialog id="circuitDialog">
-      <div id="circuitDetails"></div>
-      <button onclick="document.querySelector('#circuitDialog').close()">Close</button>
-    </dialog>
+  <dialog id="circuitDialog">
+    <div id="circuitDetails"></div>
+    <button onclick="document.querySelector('#circuitDialog').close()">Close</button>
+  </dialog>
 
-    <!-- JavaScript Files -->
-    <script defer src="jmerc673/js/storage.js"></script>
-    <script defer src="jmerc673/js/api.js"></script>
-    <script defer src="jmerc673/js/dialogs.js"></script>
-    <script defer src="jmerc673/js/app.js"></script>
+  <!-- JavaScript Files -->
+  <script defer src="jmerc673/js/storage.js"></script>
+  <script defer src="jmerc673/js/api.js"></script>
+  <script defer src="jmerc673/js/dialogs.js"></script>
+  <script defer src="jmerc673/js/app.js"></script>
 </body>
 
 </html>
