@@ -87,3 +87,21 @@ async function fetchRaceResultsByConstructor(constructorId) {
       return [];
   }
 }
+
+async function fetchRaceResultsByConstructor(constructorRef) {
+  const url = `${API_BASE_URL}/constructorResults.php?constructor=${constructorRef}&season=2022`;
+  const key = `constructor_results_${constructorRef}`;
+  return await fetchAndCache(url, key);
+}
+
+async function fetchRaceResultsByConstructor(constructorRef) {
+  const url = `${API_BASE_URL}/constructorResults.php?constructor=${constructorRef}&season=2021`;
+  const key = `constructor_results_${constructorRef}`;
+  return await fetchAndCache(url, key);
+}
+
+async function fetchRaceResultsByConstructor(constructorRef) {
+  const url = `${API_BASE_URL}/constructorResults.php?constructor=${constructorRef}&season=2020`;
+  const key = `constructor_results_${constructorRef}`;
+  return await fetchAndCache(url, key);
+}

@@ -145,9 +145,9 @@ async function showConstructorDialog(constructorId) {
                 ${raceResults.map(result => `
                     <tr>
                         <td>${result.round}</td>
-                        <td>${result.raceName}</td>
-                        <td>${result.driverName}</td>
-                        <td>${result.position}</td>
+                        <td>${result.name}</td>
+                        <td>${result.forename} ${result.surname}</td>
+                        <td>${result.positionOrder}</td>
                     </tr>
                 `).join("")}
             </tbody>
