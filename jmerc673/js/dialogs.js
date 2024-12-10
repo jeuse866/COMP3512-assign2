@@ -115,6 +115,7 @@ async function showDriverDialog(driverId) {
 }
 
 async function showConstructorDialog(constructorId) {
+    console.log(constructorId);
     const constructorDialog = document.querySelector("#constructorDialog");
     const constructorDetails = document.querySelector("#constructorDetails");
 
@@ -135,6 +136,7 @@ async function showConstructorDialog(constructorId) {
 
         const constructorImage = "https://placehold.co/600x400";
 
+        console.log(constructorId);
         let raceResultsHTML = `<table>
             <thead>
                 <tr><th>Round</th><th>Race Name</th><th>Driver</th><th>Position</th></tr>
@@ -153,7 +155,7 @@ async function showConstructorDialog(constructorId) {
 
         constructorDetails.innerHTML = `
             <img src="${constructorImage}" alt="Image of ${constructorData.name}" class="constructor-image">
-            <p class="Constructor-${constructorData.id}"><strong>Name:</strong> ${constructorData.name}</p>
+            <p class="Constructor-${constructorData.constructorId}"><strong>Name:</strong> ${constructorData.name}</p>
             <p><strong>Nationality:</strong> ${constructorData.nationality}</p>
             <p><a href="${constructorData.url}" target="_blank">Learn more on Wikipedia</a></p>
             <button id="toggleFavoriteConstructorBtn">${isFavorite ? "Remove from Favorites" : "Add to Favorites"}</button>
@@ -212,26 +214,3 @@ async function showCircuitDialog(circuitId) {
     }
 }
 
-async function fetchRaceResultsByConstructor(constructorId) {
-    try {
-        const response = await fetch(`https://www.randyconnolly.com/funwebdev/3rd/api/f1/results.php?constructor=${constructorId}`);
-        const data = await response.json();
-
-        console.log("Fetched race results:", data);
-
-        const filteredResults = data.filter(result => result.constructor.id === constructorId);
-
-        console.log("Filtered results:", filteredResults);
-
-        return filteredResults.map(result => ({
-            round: result.race?.round || "N/A",
-            raceName: result.race?.name || "N/A",
-            driverName: `${result.driver?.forename || "N/A"} ${result.driver?.surname || "N/A"}`,
-            position: result.position || "N/A",
-        }));
-
-    } catch (error) {
-        console.error("Error fetching race results by constructor:", error);
-        return [];
-    }
-}
